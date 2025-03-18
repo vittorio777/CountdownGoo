@@ -1,0 +1,106 @@
+<Window x:Class="CountdownGo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Height="300" Width="400" WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E" Foreground="#CCCCCC"
+        WindowStyle="None" AllowsTransparency="True">
+    <Window.Resources>
+        <Style x:Key="WindowButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3F3F3F"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#007ACC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 自定义标题栏 -->
+        <Grid Grid.Row="0" Background="#252526" MouseLeftButtonDown="DragWindow">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="1" Text="CountdownGo" Foreground="#CCCCCC"
+                       VerticalAlignment="Center" Margin="10,0" FontSize="12"/>
+            
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Style="{StaticResource WindowButtonStyle}" Content="&#xE949;" Click="MinimizeWindow"/>
+                <Button Style="{StaticResource WindowButtonStyle}" Content="&#xE739;" Click="MaximizeWindow"/>
+                <Button Style="{StaticResource WindowButtonStyle}" Content="&#xE106;" Click="CloseWindow"
+                        Background="Transparent"/>
+            </StackPanel>
+        </Grid>
+
+
+        <Border Grid.Row="1" Margin="25,5,25,5" BorderBrush="#3F3F3F" BorderThickness="1" CornerRadius="4">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="4" Opacity="0.15"/>
+            </Border.Effect>
+            <Grid Background="#252526" Margin="10,5">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid x:Name="HourControl" Margin="5,0">
+                        <TextBlock x:Name="HourDisplay"
+                                 Text="00"
+                                 Style="{StaticResource TimeDisplayTextBlock}"
+                                 MouseLeftButtonDown="TimeUnit_MouseLeftButtonDown"
+                                 MouseMove="TimeUnit_MouseMove"
+                                 MouseLeftButtonUp="TimeUnit_MouseLeftButtonUp"
+                                 MouseWheel="TimeUnit_MouseWheel"/>
+                    </Grid>
+                    <TextBlock Text=":" Style="{StaticResource TimeDisplayTextBlock}" Margin="-5,0"/>
+                    <Grid x:Name="MinuteControl" Margin="5,0">
+                        <TextBlock x:Name="MinuteDisplay"
+                                 Text="00"
+                                 Style="{StaticResource TimeDisplayTextBlock}"
+                                 MouseLeftButtonDown="TimeUnit_MouseLeftButtonDown"
+                                 MouseMove="TimeUnit_MouseMove"
+                                 MouseLeftButtonUp="TimeUnit_MouseLeftButtonUp"
+                                 MouseWheel="TimeUnit_MouseWheel"/>
+                    </Grid>
+                    <TextBlock Text=":" Style="{StaticResource TimeDisplayTextBlock}" Margin="-5,0"/>
+                    <Grid x:Name="SecondControl" Margin="5,0">
+                        <TextBlock x:Name="SecondDisplay"
+                                 Text="00"
+                                 Style="{StaticResource TimeDisplayTextBlock}"
+                                 MouseLeftButtonDown="TimeUnit_MouseLeftButtonDown"
+                                 MouseMove="TimeUnit_MouseMove"
+                                 MouseLeftButtonUp="TimeUnit_MouseLeftButtonUp"
+                                 MouseWheel="TimeUnit_MouseWheel"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <Button x:Name="Set10MinButton" Content="10分钟" Width="60" Height="25" Margin="5" Style="{StaticResource ModernButton}"/>
+            <Button x:Name="Set20MinButton" Content="20分钟" Width="60" Height="25" Margin="5" Style="{StaticResource ModernButton}"/>
+            <Button x:Name="Set30MinButton" Content="30分钟" Width="60" Height="25" Margin="5" Style="{StaticResource ModernButton}"/>
+            <Button x:Name="Set45MinButton" Content="45分钟" Width="60" Height="25" Margin="5" Style="{StaticResource ModernButton}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,20">
+            <Button x:Name="StartButton" Content="开始" Width="80" Height="30" Margin="5" Style="{StaticResource ModernButton}"/>
+            <Button x:Name="PauseButton" Content="暂停" Width="80" Height="30" Margin="5" Style="{StaticResource ModernButton}"/>
+            <Button x:Name="ResetButton" Content="重置" Width="80" Height="30" Margin="5" Style="{StaticResource ModernButton}"/>
+        </StackPanel>
+    </Grid>
+</Window>
