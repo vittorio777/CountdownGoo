@@ -1,9 +1,10 @@
 # CountdownGo 倒计时器
 
-CountdownGo 是一个简洁、易用的桌面倒计时器应用程序。它可以帮助你管理时间，提醒你按时完成任务。
-![image](https://github.com/user-attachments/assets/70fa5de6-04a7-4df2-a5f4-3c6926b286ca)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/70fa5de6-04a7-4df2-a5f4-3c6926b286ca" width="600">
+</p>
 
-
+这是一个简洁、易用的桌面倒计时器应用程序
 ## 主要功能
 
 - 直观的时间设置界面
