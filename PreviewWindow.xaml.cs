@@ -53,11 +53,7 @@ namespace CountdownGo
             try
             {
                 base.OnClosing(e);
-                
-                // 保存窗口位置
-                Properties.Settings.Default.PreviewWindowLeft = Left;
-                Properties.Settings.Default.PreviewWindowTop = Top;
-                Properties.Settings.Default.Save();
+                SaveWindowPosition();
             }
             catch (Exception ex)
             {
@@ -70,16 +66,24 @@ namespace CountdownGo
             TimeDisplay.Text = time;
         }
 
+        public void UpdateDisplay(TimeSpan remainingTime)
+        {
+            TimeDisplay.Text = $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}";
+        }
+
+        private void SaveWindowPosition()
+        {
+            Properties.Settings.Default.PreviewWindowLeft = Left;
+            Properties.Settings.Default.PreviewWindowTop = Top;
+            Properties.Settings.Default.Save();
+        }
+
         private void DragWindow(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 DragMove();
-                
-                // 保存窗口位置
-                Properties.Settings.Default.PreviewWindowLeft = Left;
-                Properties.Settings.Default.PreviewWindowTop = Top;
-                Properties.Settings.Default.Save();
+                SaveWindowPosition();
             }
         }
 

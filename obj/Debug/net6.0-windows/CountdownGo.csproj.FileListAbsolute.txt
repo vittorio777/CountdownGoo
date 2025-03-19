@@ -11,7 +11,6 @@ E:\Project\CountdownGo\obj\Debug\net6.0-windows\CountdownGo.AssemblyInfoInputs.c
 E:\Project\CountdownGo\obj\Debug\net6.0-windows\CountdownGo.AssemblyInfo.cs
 E:\Project\CountdownGo\obj\Debug\net6.0-windows\CountdownGo.csproj.CoreCompileInputs.cache
 E:\Project\CountdownGo\bin\Debug\net6.0-windows\CountdownGo.exe
-E:\Project\CountdownGo\bin\Debug\net6.0-windows\ahh.mp3
 E:\Project\CountdownGo\bin\Debug\net6.0-windows\CountdownGo.deps.json
 E:\Project\CountdownGo\bin\Debug\net6.0-windows\CountdownGo.runtimeconfig.json
 E:\Project\CountdownGo\bin\Debug\net6.0-windows\CountdownGo.dll
@@ -21,3 +20,8 @@ E:\Project\CountdownGo\obj\Debug\net6.0-windows\refint\CountdownGo.dll
 E:\Project\CountdownGo\obj\Debug\net6.0-windows\CountdownGo.pdb
 E:\Project\CountdownGo\obj\Debug\net6.0-windows\CountdownGo.genruntimeconfig.cache
 E:\Project\CountdownGo\obj\Debug\net6.0-windows\ref\CountdownGo.dll
+E:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\README.txt
+e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\AppleBeep.mp3
+e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\BuzzingSound.mp3
+e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\CatchySound.mp3
+e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\DigitalBeep.mp3

@@ -122,41 +122,55 @@ namespace CountdownGo
                 previewWindow.Close();
                 previewWindow = null;
             }
-            
-            // 隐藏托盘图标
-            notifyIcon.Visible = false;
+        }
+
+        private void InitializeDefaultSound()
+        {
+            try
+            {
+                var soundsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds");
+                if (!System.IO.Directory.Exists(soundsDir))
+                {
+                    System.IO.Directory.CreateDirectory(soundsDir);
+                    return;
+                }
+
+                var lastSelectedSound = Properties.Settings.Default.LastSelectedSound;
+                if (string.IsNullOrEmpty(lastSelectedSound))
+                {
+                    // 如果没有上次选择的铃声，使用第一个找到的MP3文件
+                    var soundFiles = System.IO.Directory.GetFiles(soundsDir, "*.mp3");
+                    if (soundFiles.Length > 0)
+                    {
+                        lastSelectedSound = System.IO.Path.GetFileName(soundFiles[0]);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(lastSelectedSound))
+                {
+                    var fullPath = System.IO.Path.Combine(soundsDir, lastSelectedSound);
+                    if (System.IO.File.Exists(fullPath))
+                    {
+                        var uri = new Uri(fullPath, UriKind.Absolute);
+                        alarmSound.Open(uri);
+                        alarmSound.Volume = 1.0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"初始化默认铃声失败：{ex.Message}", "CountdownGo");
+            }
         }
 
         private void LoadSoundFiles(ToolStripMenuItem soundsMenu)
         {
             try
             {
-                var soundsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\Sounds");
+                var soundsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds");
                 if (!System.IO.Directory.Exists(soundsDir))
                 {
                     System.IO.Directory.CreateDirectory(soundsDir);
-                }
-
-                var defaultSoundPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ahh.mp3");
-                var defaultSoundItem = new ToolStripMenuItem("默认铃声", null, (s, e) => {
-                    var items = soundsMenu.DropDownItems.Cast<ToolStripMenuItem>();
-                    foreach (var item in items)
-                    {
-                        item.Checked = false;
-                    }
-                    ((ToolStripMenuItem)s).Checked = true;
-                    ChangeSoundFile(defaultSoundPath);
-                    Properties.Settings.Default.LastSelectedSound = "ahh.mp3";
-                    Properties.Settings.Default.Save();
-                });
-                soundsMenu.DropDownItems.Add(defaultSoundItem);
-                
-                // 如果LastSelectedSound是默认铃声或未设置，则默认选中默认铃声
-                if (string.IsNullOrEmpty(Properties.Settings.Default.LastSelectedSound) || 
-                    Properties.Settings.Default.LastSelectedSound == "ahh.mp3")
-                {
-                    defaultSoundItem.Checked = true;
-                    ChangeSoundFile(defaultSoundPath);
                 }
 
                 var soundFiles = System.IO.Directory.GetFiles(soundsDir, "*.mp3");
@@ -177,8 +191,6 @@ namespace CountdownGo
                     if (System.IO.Path.GetFileName(soundFile) == Properties.Settings.Default.LastSelectedSound)
                     {
                         menuItem.Checked = true;
-                        defaultSoundItem.Checked = false;
-                        ChangeSoundFile(soundFile);
                     }
                     soundsMenu.DropDownItems.Add(menuItem);
                 }
@@ -186,32 +198,6 @@ namespace CountdownGo
             catch (Exception ex)
             {
                 MessageBox.Show($"加载音频文件失败：{ex.Message}", "CountdownGo");
-            }
-        }
-
-        private void ChangeSoundFile(string soundPath)
-        {
-            try
-            {
-                if (alarmSound == null)
-                {
-                    MessageBox.Show("音频播放器未正确初始化", "CountdownGo");
-                    return;
-                }
-
-                if (!System.IO.File.Exists(soundPath))
-                {
-                    MessageBox.Show($"找不到音频文件：{soundPath}", "CountdownGo");
-                    return;
-                }
-
-                alarmSound.Stop();
-                alarmSound.Open(new Uri(soundPath));
-                alarmSound.Volume = 1.0;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"切换音频文件失败：{ex.Message}", "CountdownGo");
             }
         }
 
@@ -259,6 +245,24 @@ namespace CountdownGo
         {
             InitializeComponent();
             Title = "CountdownGo";
+            
+            // 绑定鼠标移动事件
+            MouseMove += Window_MouseMove;
+
+            // 初始化按钮状态
+            StartButton.IsEnabled = true;
+            PauseButton.IsEnabled = false;
+
+            // 绑定按钮事件
+            StartButton.Click += (s, e) => StartTimer();
+            PauseButton.Click += (s, e) => PauseTimer();
+            ResetButton.Click += (s, e) => ResetTimer();
+            
+            // 绑定快速设置时间按钮事件
+            Set10MinButton.Click += (s, e) => SetTime(10);
+            Set20MinButton.Click += (s, e) => SetTime(20);
+            Set30MinButton.Click += (s, e) => SetTime(30);
+            Set45MinButton.Click += (s, e) => SetTime(45);
 
             var contextMenu = new ContextMenuStrip();
             var showPreviewItem = new ToolStripMenuItem("显示预览窗口") { Checked = true, CheckOnClick = true };
@@ -296,7 +300,7 @@ namespace CountdownGo
             notifyIcon = new NotifyIcon
             {
                 Text = "CountdownGo",
-                Visible = false,
+                Visible = true,
                 ContextMenuStrip = contextMenu,
                 Icon = System.Drawing.SystemIcons.Application
             };
@@ -341,14 +345,7 @@ namespace CountdownGo
             };
             timer.Tick += Timer_Tick;
 
-            StartButton.Click += StartButton_Click;
-            PauseButton.Click += PauseButton_Click;
-            ResetButton.Click += ResetButton_Click;
-            Set10MinButton.Click += (s, e) => SetQuickTime(10);
-            Set20MinButton.Click += (s, e) => SetQuickTime(20);
-            Set30MinButton.Click += (s, e) => SetQuickTime(30);
-            Set45MinButton.Click += (s, e) => SetQuickTime(45);
-            this.MouseMove += Window_MouseMove;
+            // 初始化音频播放器
             alarmSound = new MediaPlayer();
             alarmSound.MediaFailed += (s, e) => MessageBox.Show($"音频加载失败：{e.ErrorException.Message}", "CountdownGo");
             alarmSound.MediaEnded += (s, e) => {
@@ -364,264 +361,194 @@ namespace CountdownGo
                     alarmSound.Stop();
                 }
             };
-            try
-            {
-                var lastSelectedSound = Properties.Settings.Default.LastSelectedSound;
-                var audioPath = lastSelectedSound == "ahh.mp3" ?
-                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ahh.mp3") :
-                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\Sounds", lastSelectedSound);
-                if (System.IO.File.Exists(audioPath))
-                {
-                    alarmSound.Open(new Uri(audioPath));
-                    alarmSound.Volume = 1.0;
-                }
-                else
-                {
-                    MessageBox.Show("找不到音频文件：" + audioPath, "CountdownGo");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"无法加载音频文件：{ex.Message}", "CountdownGo");
-            }
-
-            ResetTimer();
-            UpdateAllDisplays();
+            
+            // 初始化默认铃声
+            InitializeDefaultSound();
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            StartTimer();
-        }
-
-        private void PauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            PauseTimer();
-        }
-
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
-        {
-            ResetTimer();
-        }
-
-        private void ResetTimer()
-        {
-            isRunning = false;
-            timer.Stop();
-            remainingTime = TimeSpan.Zero;
-            StartButton.IsEnabled = true;
-            PauseButton.IsEnabled = false;
-            UpdateAllDisplays();
-        }
-
-        private void Timer_Tick(object? sender, EventArgs e)
+        private void ChangeSoundFile(string soundFilePath)
         {
             try
             {
-                if (remainingTime.TotalSeconds <= 0)
+                var soundsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds");
+                var fullPath = System.IO.Path.GetFileName(soundFilePath);
+                fullPath = System.IO.Path.Combine(soundsDir, fullPath);
+
+                if (System.IO.File.Exists(fullPath))
                 {
-                    timer.Stop();
-                    isRunning = false;
+                    // 停止当前音频播放并关闭媒体源
+                    alarmSound.Stop();
+                    alarmSound.Close();
+                    alarmPlayCount = 0;
+
                     try
                     {
-                        if (alarmSound?.Source != null)
-                        {
-                            alarmPlayCount = 0;
-                            alarmSound.Stop();
-                            alarmSound.Position = TimeSpan.Zero;
-                            alarmSound.Play();
-                        }
+                        // 使用完整的URI格式加载新音频
+                        var uri = new Uri(fullPath, UriKind.Absolute);
+                        alarmSound.Open(uri);
+                        alarmSound.Volume = 1.0;
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"音频播放失败：{ex.Message}", "CountdownGo");
+                        MessageBox.Show($"音频文件格式错误或无法访问：{ex.Message}", "CountdownGo");
+                        return;
                     }
-                    ResetTimer();
-                    return;
                 }
-
-                remainingTime = remainingTime.Subtract(TimeSpan.FromSeconds(1));
-                UpdateAllDisplays();
+                else
+                {
+                    MessageBox.Show($"找不到音频文件：{fullPath}", "CountdownGo");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"计时器更新失败：{ex.Message}", "CountdownGo");
-                ResetTimer();
+                MessageBox.Show($"音频文件操作失败：{ex.Message}", "CountdownGo");
             }
         }
-
-        private void UpdateAllDisplays()
+        private void Window_MouseMove(object sender, MouseEventArgs e)
         {
             try
             {
-                HourDisplay.Text = remainingTime.Hours.ToString("00");
-                MinuteDisplay.Text = remainingTime.Minutes.ToString("00");
-                SecondDisplay.Text = remainingTime.Seconds.ToString("00");
-
-                if (previewWindow != null && !previewWindow.IsClosing)
-                {
-                    previewWindow.UpdateTime($"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}");
-                }
+                StopAlarm();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"显示更新失败：{ex.Message}", "CountdownGo");
+                MessageBox.Show($"停止闹铃失败：{ex.Message}", "CountdownGo");
             }
         }
 
         private void TimeUnit_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (alarmPlayCount > 0)
-            {
-                StopAlarm();
-                return;
-            }
-
-            if (isRunning) return;
             isDragging = true;
             activeTimeUnit = sender as TextBlock;
             lastMousePosition = e.GetPosition(activeTimeUnit);
-            activeTimeUnit?.CaptureMouse();
+            activeTimeUnit.CaptureMouse();
         }
 
         private void TimeUnit_MouseMove(object sender, MouseEventArgs e)
         {
-            if (alarmPlayCount > 0)
+            if (isDragging && activeTimeUnit != null)
             {
-                StopAlarm();
-                return;
+                Point currentPosition = e.GetPosition(activeTimeUnit);
+                double deltaY = currentPosition.Y - lastMousePosition.Y;
+
+                if (Math.Abs(deltaY) > 10)
+                {
+                    int change = deltaY > 0 ? -1 : 1;
+                    UpdateTimeUnit(activeTimeUnit.Name, change);
+                    lastMousePosition = currentPosition;
+                }
             }
-
-            if (!isDragging || activeTimeUnit == null) return;
-
-            var currentPosition = e.GetPosition(activeTimeUnit);
-            var deltaY = currentPosition.Y - lastMousePosition.Y;
-
-            if (Math.Abs(deltaY) < 4) return;
-
-            var increment = deltaY > 0 ? -1 : 1;
-            var hours = remainingTime.Hours;
-            var minutes = remainingTime.Minutes;
-            var seconds = remainingTime.Seconds;
-
-            if (activeTimeUnit == HourDisplay)
-            {
-                hours = Math.Max(0, Math.Min(23, hours + increment));
-                activeTimeUnit.Opacity = 0.7;
-            }
-            else if (activeTimeUnit == MinuteDisplay)
-            {
-                minutes = Math.Max(0, Math.Min(59, minutes + increment));
-                activeTimeUnit.Opacity = 0.7;
-            }
-            else if (activeTimeUnit == SecondDisplay)
-            {
-                seconds = Math.Max(0, Math.Min(59, seconds + increment));
-                activeTimeUnit.Opacity = 0.7;
-            }
-
-            remainingTime = new TimeSpan(hours, minutes, seconds);
-            UpdateAllDisplays();
-            lastMousePosition = currentPosition;
         }
 
         private void TimeUnit_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!isDragging) return;
-            isDragging = false;
-            if (activeTimeUnit != null)
+            if (isDragging && activeTimeUnit != null)
             {
-                activeTimeUnit.Opacity = 1.0;
                 activeTimeUnit.ReleaseMouseCapture();
+                isDragging = false;
                 activeTimeUnit = null;
-            }
-        }
-
-        public void StopAlarm()
-        {
-            if (alarmSound.Source != null)
-            {
-                alarmPlayCount = 0;
-                alarmSound.Stop();
-            }
-        }
-
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
-        {
-            base.OnPreviewKeyDown(e);
-
-            if (alarmPlayCount > 0)
-            {
-                StopAlarm();
-                return;
-            }
-
-            if (isRunning) return;
-
-            switch (e.Key)
-            {
-                case Key.Up:
-                    remainingTime = remainingTime.Add(TimeSpan.FromMinutes(1));
-                    UpdateAllDisplays();
-                    break;
-                case Key.Down:
-                    if (remainingTime.TotalMinutes > 0)
-                    {
-                        remainingTime = remainingTime.Subtract(TimeSpan.FromMinutes(1));
-                        UpdateAllDisplays();
-                    }
-                    break;
             }
         }
 
         private void TimeUnit_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (alarmPlayCount > 0)
-            {
-                StopAlarm();
-                return;
-            }
-
-            if (isRunning) return;
-
-            var textBlock = sender as TextBlock;
-            if (textBlock == null) return;
-
-            var hours = remainingTime.Hours;
-            var minutes = remainingTime.Minutes;
-            var seconds = remainingTime.Seconds;
-            var increment = e.Delta > 0 ? 1 : -1;
-
-            if (textBlock == HourDisplay)
-            {
-                hours = Math.Max(0, Math.Min(23, hours + increment));
-            }
-            else if (textBlock == MinuteDisplay)
-            {
-                minutes = Math.Max(0, Math.Min(59, minutes + increment));
-            }
-            else if (textBlock == SecondDisplay)
-            {
-                seconds = Math.Max(0, Math.Min(59, seconds + increment));
-            }
-
-            remainingTime = new TimeSpan(hours, minutes, seconds);
-            UpdateAllDisplays();
-        }
-        private void Window_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (alarmPlayCount > 0)
-            {
-                StopAlarm();
-                return;
-            }
+            TextBlock timeUnit = sender as TextBlock;
+            int change = e.Delta > 0 ? 1 : -1;
+            UpdateTimeUnit(timeUnit.Name, change);
         }
 
-        private void SetQuickTime(int minutes)
+        private void SetTime(int minutes)
         {
-            if (isRunning) return;
             remainingTime = TimeSpan.FromMinutes(minutes);
             UpdateAllDisplays();
+        }
+
+        private void UpdateTimeUnit(string unitName, int change)
+        {
+            switch (unitName)
+            {
+                case "HourDisplay":
+                    remainingTime = remainingTime.Add(TimeSpan.FromHours(change));
+                    break;
+                case "MinuteDisplay":
+                    remainingTime = remainingTime.Add(TimeSpan.FromMinutes(change));
+                    break;
+                case "SecondDisplay":
+                    remainingTime = remainingTime.Add(TimeSpan.FromSeconds(change));
+                    break;
+            }
+
+            if (remainingTime < TimeSpan.Zero)
+            {
+                remainingTime = TimeSpan.Zero;
+            }
+
+            UpdateAllDisplays();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (remainingTime.TotalSeconds > 0)
+            {
+                remainingTime = remainingTime.Subtract(TimeSpan.FromSeconds(1));
+                
+                if (remainingTime.TotalSeconds <= 0)
+                {
+                    remainingTime = TimeSpan.Zero;
+                    timer.Stop();
+                    isRunning = false;
+                    StartButton.IsEnabled = true;
+                    PauseButton.IsEnabled = false;
+                    UpdateAllDisplays();
+                    if (alarmSound != null && alarmSound.Source != null)
+                    {
+                        StopAlarm();
+                        alarmSound.Play();
+                    }
+                    return;
+                }
+                
+                UpdateAllDisplays();
+            }
+        }
+
+        private void UpdateAllDisplays()
+        {
+            HourDisplay.Text = remainingTime.Hours.ToString("00");
+            MinuteDisplay.Text = remainingTime.Minutes.ToString("00");
+            SecondDisplay.Text = remainingTime.Seconds.ToString("00");
+
+            if (previewWindow != null)
+            {
+                previewWindow.UpdateDisplay(remainingTime);
+            }
+        }
+
+        public void StopAlarm()
+        {
+            if (alarmSound != null && alarmSound.Source != null)
+            {
+                alarmSound.Stop();
+                alarmSound.Position = TimeSpan.Zero;
+                alarmPlayCount = 0;
+            }
+        }
+
+        private void ResetTimer()
+        {
+            if (isRunning)
+            {
+                timer.Stop();
+                isRunning = false;
+            }
+            remainingTime = TimeSpan.Zero;
+            StartButton.IsEnabled = true;
+            PauseButton.IsEnabled = false;
+            UpdateAllDisplays();
+            if (previewWindow != null)
+            {
+                previewWindow.UpdatePlayPauseMenuItemStatus();
+            }
         }
     }
 }
