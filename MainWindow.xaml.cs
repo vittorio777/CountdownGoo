@@ -68,6 +68,10 @@ namespace CountdownGo
                 return;
             }
 
+            notifyIcon.Visible = true;
+            Hide();
+            WindowState = WindowState.Minimized;
+
             try
             {
                 if (showPreviewEnabled)
@@ -90,10 +94,6 @@ namespace CountdownGo
                 MessageBox.Show($"预览窗口操作失败：{ex.Message}", "CountdownGo");
                 return;
             }
-
-            notifyIcon.Visible = true;
-            Hide();
-            WindowState = WindowState.Minimized;
 
         }
 

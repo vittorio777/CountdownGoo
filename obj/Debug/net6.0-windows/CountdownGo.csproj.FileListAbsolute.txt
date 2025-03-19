@@ -25,3 +25,4 @@ e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\AppleBeep.mp3
 e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\BuzzingSound.mp3
 e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\CatchySound.mp3
 e:\Project\CountdownGo\bin\Debug\net6.0-windows\Sounds\DigitalBeep.mp3
+E:\Project\CountdownGo\obj\Debug\net6.0-windows\CountdownGo.sourcelink.json
