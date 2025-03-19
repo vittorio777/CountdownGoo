@@ -143,6 +143,8 @@ namespace CountdownGo
                     if (soundFiles.Length > 0)
                     {
                         lastSelectedSound = System.IO.Path.GetFileName(soundFiles[0]);
+                        Properties.Settings.Default.LastSelectedSound = lastSelectedSound;
+                        Properties.Settings.Default.Save();
                     }
                 }
 
@@ -376,10 +378,9 @@ namespace CountdownGo
 
                 if (System.IO.File.Exists(fullPath))
                 {
-                    // 停止当前音频播放并关闭媒体源
-                    alarmSound.Stop();
+                    // 停止当前音频播放并重置状态
+                    StopAlarm();
                     alarmSound.Close();
-                    alarmPlayCount = 0;
 
                     try
                     {
@@ -526,11 +527,14 @@ namespace CountdownGo
 
         public void StopAlarm()
         {
-            if (alarmSound != null && alarmSound.Source != null)
+            if (alarmSound != null)
             {
-                alarmSound.Stop();
-                alarmSound.Position = TimeSpan.Zero;
                 alarmPlayCount = 0;
+                alarmSound.Stop();
+                if (alarmSound.Source != null)
+                {
+                    alarmSound.Position = TimeSpan.Zero;
+                }
             }
         }
 
