@@ -1,0 +1,11 @@
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\icon.ico
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\AppleBeep.mp3
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\BuzzingSound.mp3
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\CatchySound.mp3
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\DigitalBeep.mp3
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\README.txt
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\CountdownGo.exe
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\CountdownGo.dll
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\CountdownGo.deps.json
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\CountdownGo.runtimeconfig.json
+e:\Project\CountdownGo\bin\Release\net6.0-windows\publish\CountdownGo.pdb

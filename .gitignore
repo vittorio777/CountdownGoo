@@ -1,0 +1,30 @@
+# 忽略advertise文件夹及其内容
+advertise/
+advertise/*.png
+advertise/说明.txt
+
+# Visual Studio临时文件
+.vs/
+*.user
+*.suo
+
+# 编译输出目录
+bin/
+obj/
+
+# 临时文件
+*.tmp
+*.log
+
+# IDE配置文件
+*.sln.docstates
+.idea/
+
+# NuGet包
+packages/
+
+# 其他临时文件
+[Tt]emp/
+[Tt]mp/
+*.bak
+*.cache

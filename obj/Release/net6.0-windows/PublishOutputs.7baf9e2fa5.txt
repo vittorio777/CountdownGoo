@@ -1,3 +1,4 @@
+E:\Project\CountdownGo\bin\Release\net6.0-windows\publish\icon.ico
 E:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\AppleBeep.mp3
 E:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\BuzzingSound.mp3
 E:\Project\CountdownGo\bin\Release\net6.0-windows\publish\Sounds\CatchySound.mp3

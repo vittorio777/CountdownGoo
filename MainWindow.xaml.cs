@@ -250,6 +250,37 @@ namespace CountdownGo
             
             // 绑定鼠标移动事件
             MouseMove += Window_MouseMove;
+            
+            // 绑定窗口状态改变事件
+            StateChanged += (s, e) => {
+                if (WindowState == WindowState.Minimized)
+                {
+                    if (notifyIcon == null)
+                    {
+                        MessageBox.Show("系统托盘图标未正确初始化", "CountdownGo");
+                        return;
+                    }
+                    notifyIcon.Visible = true;
+                    Hide();
+                    
+                    try
+                    {
+                        if (showPreviewEnabled)
+                        {
+                            if (previewWindow == null)
+                            {
+                                previewWindow = new PreviewWindow(this);
+                                previewWindow.Show();
+                                UpdateAllDisplays();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"预览窗口操作失败：{ex.Message}", "CountdownGo");
+                    }
+                }
+            };
 
             // 初始化按钮状态
             StartButton.IsEnabled = true;
@@ -307,7 +338,9 @@ namespace CountdownGo
                 Icon = System.Drawing.SystemIcons.Application
             };
 
-            var iconPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "..\\..\\..\\icon.ico");
+            var exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var exeDir = System.IO.Path.GetDirectoryName(exePath);
+            var iconPath = System.IO.Path.Combine(exeDir, "icon.ico");
             try
             {
                 if (System.IO.File.Exists(iconPath))
